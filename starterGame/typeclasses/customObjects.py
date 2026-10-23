@@ -22,3 +22,12 @@ class Dragon(Monster):
         Let our dragon breathe fire.
         """
         print(f"{self.key} breathes fire!")
+
+
+
+
+
+class Chair(Object):
+    
+    def at_object_creation(self):
+        self.db.sittable = True

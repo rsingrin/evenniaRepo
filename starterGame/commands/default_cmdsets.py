@@ -36,6 +36,8 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         self.add(mycommands.myCmdSet)
         self.add(mycommands.attackCmdSet)
+        self.add(mycommands.builderCrap)
+        self.add(mycommands.chairCmdSet)
 
 class AccountCmdSet(default_cmds.AccountCmdSet):
     """

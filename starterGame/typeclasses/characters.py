@@ -29,6 +29,9 @@ class Character(ObjectParent, DefaultCharacter):
         self.db.strength = randint(1, 20)
         self.db.dex = randint(1, 20)
         self.db.wis = randint(1, 20)        
+        self.db.isStanding = True
+        
+    
     
     def get_stats(self):
         return f"Strength: {self.db.strength}, Dexterity: {self.db.dex}, Wisdom: {self.db.wis}"
