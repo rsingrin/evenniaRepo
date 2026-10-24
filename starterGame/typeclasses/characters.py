@@ -10,6 +10,7 @@ creation commands.
 from random import randint
 from evennia.objects.objects import DefaultCharacter
 from .objects import ObjectParent
+from typeclasses.customObjects import Chair
 
 
 class Character(ObjectParent, DefaultCharacter):
@@ -29,11 +30,16 @@ class Character(ObjectParent, DefaultCharacter):
         self.db.strength = randint(1, 20)
         self.db.dex = randint(1, 20)
         self.db.wis = randint(1, 20)        
-        self.db.isStanding = True
-        
-    
+
+
+    def at_pre_move(self, destination, move_type="move", **kwargs):
+        pass
+        # if not self.db.chairName == None:
+        #     self.msg("you are sitting!")
+        #     return False
+        # return super().at_pre_move(destination, move_type, **kwargs)
     
     def get_stats(self):
-        return f"Strength: {self.db.strength}, Dexterity: {self.db.dex}, Wisdom: {self.db.wis}"
+        return f"Strength: {self.db.strength}, Dexterity: {self.db.dex}, Wiz: {self.db.wis}"
 
     pass

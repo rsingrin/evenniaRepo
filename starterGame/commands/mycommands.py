@@ -69,7 +69,7 @@ class stats(Command):
     
     key = "stats"
     def func(self):
-        self.caller.msg(self.msg(self.caller.get_stats()))
+        self.caller.msg(self.caller.get_stats())
     
     
 class quickfind(Command):
