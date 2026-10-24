@@ -14,20 +14,24 @@ class CreateMyJunk(Command):
 
     """
     key = "CreateMyJunk"
+    locks = "cmd:perm(Builder)"
 
     def func(self):
-        mapping = {"Dragon":customObjects.Dragon,
-               "Chair":customObjects.Chair}
+        mapping = {"dragon":customObjects.Dragon,
+               "sittable":customObjects.Sittable}
         query = self.args.split()
-        if not query:
-            self.caller.msg("no input provided")
+        if len(query) < 2:
+            self.caller.msg("usage: CreateMyJunk <type> <name>")
             return
-        if not mapping.get(query[0]):
-            self.caller.msg(f"no object class of type {mapping.get(query[0])} found")
+        typeclass = mapping.get(query[0].lower())
+        if not typeclass:
+            self.caller.msg(f"no object class of type {query[0]} found")
             return
-        
-        evennia.create_object(f"typeclasses.customObjects.{query[0]}", key =query[1], location=self.caller.location)
-    
+
+        name = " ".join(query[1:])
+        evennia.create_object(typeclass, key=name, location=self.caller.location)
+        self.caller.msg(f"created {query[0].lower()} '{name}'")
+
 
 
 """
@@ -40,8 +44,35 @@ class Sit(Command):
     """
     key = "sit"
     def func(self):
-        ObjectName = self.args
-        candidate = self.caller.search(ObjectName)
+        ObjectName = self.args.strip()
+        
+        if self.caller.db.sitting_on is not None:
+            self.caller.msg("you are already sitting!")
+            return
+        
+        if not ObjectName:
+            self.caller.msg("sit on what?")
+            return
+
+        # only look in the room, not in our inventory
+        candidate = self.caller.search(ObjectName, location=self.caller.location)
+        if candidate is None:
+            # search already told the caller what went wrong
+            return
+
+        if not candidate.tags.has("sittable"):
+            self.caller.msg("object is not sittable!")
+            return
+
+        # see if anyone else in the room is already sitting on it
+        for obj in self.caller.location.contents:
+            if obj.db.sitting_on == candidate:
+                self.caller.msg(f"{obj.key} is already sitting on {candidate}!")
+                return
+
+        self.caller.msg(f"you sit on {candidate}")
+        self.caller.location.msg_contents(f"{self.caller.key} sits on {candidate}.", exclude=self.caller)
+        self.caller.db.sitting_on = candidate
             
 
 
@@ -52,7 +83,14 @@ class Stand(Command):
     """
     key = "stand"
     def func(self):
-        return
+        if self.caller.db.sitting_on is None:
+            self.caller.msg("you are already standing!")
+            return
+        chair = self.caller.db.sitting_on
+        self.caller.msg(f"you stand up from {chair}")
+        if self.caller.location:
+            self.caller.location.msg_contents(f"{self.caller.key} stands up from {chair}.", exclude=self.caller)
+        self.caller.db.sitting_on = None
 
 
 
@@ -82,7 +120,6 @@ class quickfind(Command):
     """
     key = "quickfind"
     def func(self):
-        print("hi!")
         query = self.args
         result = self.caller.search(query)
         if not result:
@@ -101,7 +138,7 @@ class CmdEcho(Command):
     
     key = "echo"
     def func(self):
-        self.caller.msg(self.msg(self.args))
+        self.caller.msg(self.args)
     
     
 class CmdHit(Command):

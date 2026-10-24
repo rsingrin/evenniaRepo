@@ -23,4 +23,10 @@ class Exit(ObjectParent, DefaultExit):
 
     """
 
-    pass
+    def at_failed_traverse(self, traversing_object, **kwargs):
+        # Character.at_pre_move blocks seated characters; say why instead
+        # of the generic "You cannot go there."
+        if traversing_object.db.sitting_on is not None:
+            traversing_object.msg("you are sitting!")
+            return
+        super().at_failed_traverse(traversing_object, **kwargs)

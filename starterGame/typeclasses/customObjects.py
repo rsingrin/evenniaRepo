@@ -27,7 +27,8 @@ class Dragon(Monster):
 
 
 
-class Chair(Object):
-    
+class Sittable(Object):
+
     def at_object_creation(self):
-        self.db.sittable = True
+        self.locks.add("get:false()")
+        self.tags.add(key="sittable")
